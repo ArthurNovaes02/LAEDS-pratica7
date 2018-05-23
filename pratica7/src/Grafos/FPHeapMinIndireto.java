@@ -1,10 +1,11 @@
 package Grafos;
 public class FPHeapMinIndireto { 
-  private double p[]; 
+  private double pTemp[]; 
+  private double pDist[]; 
   private int n, pos[], fp[];    
 
-  public FPHeapMinIndireto (double p[], int v[]) { 
-    this.p = p; this.fp = v; this.n = this.fp.length-1;
+  public FPHeapMinIndireto (double pDist[], double pTemp[], int v[]) { 
+    this.pDist = pDist; this.pTemp = pTemp; this.fp = v; this.n = this.fp.length-1;
     this.pos = new int[this.n];
     for (int u = 0; u < this.n; u++) this.pos[u] = u+1;
   }
@@ -13,8 +14,8 @@ public class FPHeapMinIndireto {
     int j = esq * 2;
     int x = this.fp[esq];
     while (j <= dir) {
-      if ((j < dir) && (this.p[fp[j]] > this.p[fp[j + 1]])) j++;
-      if (this.p[x] <= this.p[fp[j]]) break;
+      if ((j < dir) && (this.pDist[fp[j]] + this.pTemp[fp[j]] > this.pDist[fp[j + 1]] + this.pTemp[fp[j + 1]])) j++;
+      if (this.pDist[x] <= this.pDist[fp[j]]) break;
       this.fp[esq] = this.fp[j]; this.pos[fp[j]] = esq; 
       esq = j; j = esq * 2;
     }
@@ -36,12 +37,13 @@ public class FPHeapMinIndireto {
     return minimo;
   }
 
-  public void diminuiChave (int i, double chaveNova) throws Exception {
+  public void diminuiChave (int i, double chaveNovaTemp, double chaveNovaDist) throws Exception {
     i = this.pos[i]; int x = fp[i];
-    if (chaveNova < 0)
+    if (chaveNovaTemp < 0 && chaveNovaDist < 0)
       throw new Exception ("Erro: chaveNova com valor incorreto");
-    this.p[x] = chaveNova;
-    while ((i > 1) && (this.p[x] <= this.p[fp[i / 2]])) {
+    this.pDist[x] = chaveNovaDist;
+    this.pTemp[x] = chaveNovaTemp;
+    while ((i > 1) && (this.pDist[x] + this.pTemp[x] <= this.pDist[fp[i / 2]] + this.pTemp[fp[i / 2]])) {
       this.fp[i] = this.fp[i / 2]; this.pos[fp[i / 2]] = i; i /= 2;
     }
     this.fp[i] = x; this.pos[x] = i;
@@ -51,7 +53,7 @@ public class FPHeapMinIndireto {
     
   public void imprime () {
     for (int i = 1; i <= this.n; i++)
-      System.out.print (this.p[fp[i]] + " ");
+      System.out.print ("Dist: " + this.pDist[fp[i]] + " Temp: " + this.pDist[fp[i]] + " ");
     System.out.println ();
   }
 
